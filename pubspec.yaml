@@ -29,6 +29,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  ninja: ^3.0.7
   pointycastle: ^3.3.5
   # pointycastle wrapper
   basic_utils: ^3.7.0

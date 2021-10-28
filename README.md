@@ -1,5 +1,21 @@
 # fc_rsa
 
+ninja dart für signature + encryption 
+
+https://pub.dev/packages/ninja
+
+ninja: ^3.0.7
+
+https://github.com/ninja-dart/ninja
+
+fast_rsa für RSA signature PSS
+
+https://pub.dev/packages/fast_rsa
+
+fast_rsa: ^3.0.3
+
+https://github.com/jerson/flutter-rsa
+
 https://pub.dev/packages/pointycastle
 
 pointycastle: ^3.3.5
@@ -46,6 +62,14 @@ Test 214 Zeichen:
 "algorithm": "RSA-2048 PKCS 1.5",
 "ciphertext": "ZIeDA6lqGjRHr6sopONTZzxDVNFAGunsIzhK/GfcGZIHUMcwFkvRiYGTocBKY3xurQ/OALHnfJIR4NyvwXNEQzBjhrIjX10sQpMTCGvxnXA57tlfrTdj/Mky3w0qHJ2DL8eXkWnHFsZLs/euabsloIhyhjx5xJ0dKN5ofm5QdHd4tiYz+1G062AvAq/raghV53GJOyxM5YFjWkNXJO1MiV1KMJRK4im77CnpLRCLL/Tbg4soZk6lflHTPfdeB8/5C/S+5f3mgloDyLXsp+NXBDOOFqsg7A1kz2+kFXjZ4E4tw76wEezKq84+u6kVcWBv8/UkZVdTUH7iIQIEPqsE0w=="
 }
+
+{
+"algorithm": "RSA-2048 PSS",
+"plaintext": "VGhlIHF1aWNrIGJyb3duIGZveCBqdW1wcyBvdmVyIHRoZSBsYXp5IGRvZw==",
+"ciphertext": "Vyr8UkQ35TmG3jU7P8NpcIjswMqFT+8RXVt4kDhwmzKZjB6R+nC5ixqUzPlE2sbeCjweEriFSnMsRyiUhkUXQyDk31TV09SEPWwmFxFLzMSWDoRnSWNg/Js1/lr+8BTVPSyvz9Ja2E6gIimd349b0TyPHhrQxlULy3g7F4mDh5vAIVkmsvzidt3+KpIGunpeXvW2Vo9q2AAWfnH2aW3aSyx8BzBY6ODLNkdU8/VZWwi1VFUqjpK8EI7hUeDZf3fbM388/73ced0zgw/hgufFpz535y+4ieF8kwGV0HOefoepRTv6eMnyNzLug4u4HfNSKv7oI1Eq95xkQjMnFPtE/Q=="
+}
+
+
 
 
 A new Flutter project.
