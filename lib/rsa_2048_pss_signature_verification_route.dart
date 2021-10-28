@@ -85,15 +85,15 @@ class _MyFormPageState extends State<Rsa2048PssSignatureVerificationRoute> {
                 ),
 
                 SizedBox(height: 20),
-                // ciphertext
+                // signatur
                 TextFormField(
                   controller: ciphertextController,
                   maxLines: 15,
-                  maxLength: 500,
+                  maxLength: 700,
                   decoration: InputDecoration(
-                    labelText: 'Ciphertext',
+                    labelText: 'Signatur',
                     hintText:
-                        'kopieren Sie den verschlüsselten Text in dieses Feld',
+                        'kopieren Sie den signierten Text in dieses Feld',
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -227,9 +227,7 @@ class _MyFormPageState extends State<Rsa2048PssSignatureVerificationRoute> {
                             final parsedJson = json.decode(jsonAsymmetricEncryption);
                             algorithm = parsedJson['algorithm'];
                             plaintextBase64 = parsedJson['plaintext'];
-                            //signatureBase64 = parsedJson['signature'];
-                            // todo change ciphertext to signature
-                            signatureBase64 = parsedJson['ciphertext'];
+                            signatureBase64 = parsedJson['signature'];
                           } on FormatException catch (e) {
                             outputController.text =
                                 'Fehler: Die Eingabe sieht nicht nach einem Json-Datensatz aus.';
@@ -277,10 +275,10 @@ class _MyFormPageState extends State<Rsa2048PssSignatureVerificationRoute> {
                 TextFormField(
                   controller: outputController,
                   maxLines: 3,
-                  maxLength: 500,
+                  maxLength: 100,
                   decoration: InputDecoration(
                     labelText: 'Klartext',
-                    hintText: 'hier steht der entschlüsselte Text',
+                    hintText: 'hier steht der KLartext',
                     border: OutlineInputBorder(),
                   ),
                 ),

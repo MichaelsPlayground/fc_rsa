@@ -41,14 +41,14 @@ class _MyFormPageState extends State<Rsa2048PssSignatureRoute> {
     var parts = data.split(':');
     var algorithm = parts[0];
     var plaintext = parts[1];
-    var ciphertext = parts[2];
+    var signature = parts[2];
 
     // todo change ciphertext to signature
 
     JsonAsymmetricSignature jsonAsymmetricSignature = JsonAsymmetricSignature(
         algorithm: algorithm,
         plaintext: plaintext,
-        ciphertext: ciphertext);
+        signature: signature);
 
     String encryptionResult = jsonEncode(jsonAsymmetricSignature);
     // make it pretty
@@ -351,16 +351,16 @@ class JsonAsymmetricSignature {
   JsonAsymmetricSignature({
     required this.algorithm,
     required this.plaintext,
-    required this.ciphertext,
+    required this.signature,
   });
 
   final String algorithm;
   final String plaintext;
-  final String ciphertext;
+  final String signature;
 
   Map toJson() => {
         'algorithm': algorithm,
         'plaintext': plaintext,
-        'ciphertext': ciphertext,
+        'signature': signature,
       };
 }
