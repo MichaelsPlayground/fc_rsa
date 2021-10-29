@@ -80,7 +80,8 @@ class _MainFormPageState extends State<MainFormPage> {
       padding: const EdgeInsets.all(10.0),
       decoration: linkBoxDecoration(), // <--- BoxDecoration here
       child: Text(
-        'Verwendete Kryptographie Bibliothek: ninja_dart Version 3.0.7'
+        'Verwendete Kryptographie Bibliothek:'
+        '\nninja_dart Version 3.0.7'
         '\nhttps://pub.dev/packages/ninja',
         style: TextStyle(
           fontSize: 14,
