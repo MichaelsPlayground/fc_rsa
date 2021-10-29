@@ -1,23 +1,23 @@
 import 'dart:typed_data';
 import 'dart:convert';
+import 'package:basic_utils/basic_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:ninja/asymmetric/rsa/rsa.dart';
-
+import 'package:pointycastle/export.dart' as pc;
 
 import 'storage.dart';
 
-class Rsa2048PssSignatureRoute extends StatefulWidget {
-  const Rsa2048PssSignatureRoute({Key? key}) : super(key: key);
+class Rsa2048OaepSha1DecryptionRoute extends StatefulWidget {
+  const Rsa2048OaepSha1DecryptionRoute({Key? key}) : super(key: key);
 
-  final String title = 'Signatur';
-  final String subtitle = 'RSA 2048 PSS';
+  final String title = 'Entschlüsselung';
+  final String subtitle = 'RSA 2048 OAEP SHA-1';
 
   @override
   _MyFormPageState createState() => _MyFormPageState();
 }
 
-class _MyFormPageState extends State<Rsa2048PssSignatureRoute> {
+class _MyFormPageState extends State<Rsa2048OaepSha1DecryptionRoute> {
   @override
   void initState() {
     super.initState();
@@ -26,34 +26,13 @@ class _MyFormPageState extends State<Rsa2048PssSignatureRoute> {
 
   final _formKey = GlobalKey<FormState>();
   TextEditingController descriptionController = TextEditingController();
-
-  // the following controller have a default value
-  TextEditingController plaintextController = TextEditingController(
-      text: 'The quick brown fox jumps over the lazy dog');
+  TextEditingController ciphertextController = TextEditingController();
   TextEditingController privateKeyController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
   TextEditingController outputController = TextEditingController();
 
-  String txtDescription =
-      'RSA 2048 Signatur mit PSS Padding und SHA-256 Hashing.'
-      ' Der öffentliche Schlüssel ist im PEM PKCS#8 Format.';
-
-  String _returnJson(String data) {
-    var parts = data.split(':');
-    var algorithm = parts[0];
-    var plaintext = parts[1];
-    var signature = parts[2];
-
-    JsonAsymmetricSignature jsonAsymmetricSignature = JsonAsymmetricSignature(
-        algorithm: algorithm,
-        plaintext: plaintext,
-        signature: signature);
-
-    String encryptionResult = jsonEncode(jsonAsymmetricSignature);
-    // make it pretty
-    var object = json.decode(encryptionResult);
-    var prettyEncryptionResult2 = JsonEncoder.withIndent('  ').convert(object);
-    return prettyEncryptionResult2;
-  }
+  String txtDescription = 'RSA 2048 Entschlüsselung mit OAEP SHA-1 Padding (maximal 214 Zeichen).'
+      ' Der private Schlüssel ist im PEM PKCS#8 Format.';
 
   Future<bool> _fileExistsPrivateKey() async {
     bool ergebnis = false;
@@ -92,15 +71,13 @@ class _MyFormPageState extends State<Rsa2048PssSignatureRoute> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
-                //SizedBox(height: 20),
                 // form description
                 TextFormField(
                   controller: descriptionController,
                   keyboardType: TextInputType.text,
                   autocorrect: false,
                   enabled: false,
-                  // false = disabled, true = enabled
-                  maxLines: 4,
+                  maxLines: 3,
                   decoration: InputDecoration(
                     labelText: 'Beschreibung',
                     border: OutlineInputBorder(),
@@ -108,23 +85,17 @@ class _MyFormPageState extends State<Rsa2048PssSignatureRoute> {
                 ),
 
                 SizedBox(height: 20),
-                // plaintext
+                // ciphertext
                 TextFormField(
-                  controller: plaintextController,
-                  maxLines: 3,
-                  maxLength: 100,
-                  keyboardType: TextInputType.multiline,
-                  autocorrect: false,
+                  controller: ciphertextController,
+                  maxLines: 15,
+                  maxLength: 500,
                   decoration: InputDecoration(
-                    labelText: 'Klartext',
+                    labelText: 'Ciphertext',
+                    hintText:
+                        'kopieren Sie den verschlüsselten Text in dieses Feld',
                     border: OutlineInputBorder(),
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Bitte Daten eingeben';
-                    }
-                    return null;
-                  },
                 ),
                 SizedBox(height: 10),
                 Row(
@@ -135,7 +106,7 @@ class _MyFormPageState extends State<Rsa2048PssSignatureRoute> {
                           primary: Colors.grey,
                           textStyle: TextStyle(color: Colors.white)),
                       onPressed: () {
-                        plaintextController.text = '';
+                        ciphertextController.text = '';
                       },
                       child: Text('Feld löschen'),
                     ),
@@ -147,7 +118,7 @@ class _MyFormPageState extends State<Rsa2048PssSignatureRoute> {
                       onPressed: () async {
                         final data =
                             await Clipboard.getData(Clipboard.kTextPlain);
-                        plaintextController.text = data!.text!;
+                        ciphertextController.text = data!.text!;
                       },
                       child: Text('aus Zwischenablage einfügen'),
                     ),
@@ -162,7 +133,7 @@ class _MyFormPageState extends State<Rsa2048PssSignatureRoute> {
                   maxLength: 2000,
                   keyboardType: TextInputType.multiline,
                   autocorrect: false,
-                  // enabled: false,
+                  //enabled: false,
                   decoration: InputDecoration(
                     labelText: 'Privater Schlüssel',
                     border: OutlineInputBorder(),
@@ -185,7 +156,7 @@ class _MyFormPageState extends State<Rsa2048PssSignatureRoute> {
                           textStyle: TextStyle(color: Colors.white)),
                       onPressed: () async {
                         final data =
-                            await Clipboard.getData(Clipboard.kTextPlain);
+                        await Clipboard.getData(Clipboard.kTextPlain);
                         privateKeyController.text = data!.text!;
                       },
                       child: Text('Schlüssel aus Zwischenablage einfügen'),
@@ -213,7 +184,7 @@ class _MyFormPageState extends State<Rsa2048PssSignatureRoute> {
                           textStyle: TextStyle(color: Colors.white)),
                       onPressed: () async {
                         bool priKeyFileExists =
-                            await _fileExistsPrivateKey() as bool;
+                        await _fileExistsPrivateKey() as bool;
                         if (priKeyFileExists) {
                           await _readDataPrivateKey();
                         }
@@ -232,11 +203,9 @@ class _MyFormPageState extends State<Rsa2048PssSignatureRoute> {
                           primary: Colors.grey,
                           textStyle: TextStyle(color: Colors.white)),
                       onPressed: () {
-                        // reset() setzt alle Felder wieder auf den Initalwert zurück.
                         //_formKey.currentState!.reset();
-                        plaintextController.text = '';
+                        ciphertextController.text = '';
                         privateKeyController.text = '';
-                        outputController.text = '';
                       },
                       child: Text('Formulardaten löschen'),
                     ),
@@ -245,46 +214,61 @@ class _MyFormPageState extends State<Rsa2048PssSignatureRoute> {
                       style: ElevatedButton.styleFrom(
                           primary: Colors.blue,
                           textStyle: TextStyle(color: Colors.white)),
-                      onPressed: () async {
+                      onPressed: () {
                         // Wenn alle Validatoren der Felder des Formulars gültig sind.
                         if (_formKey.currentState!.validate()) {
-                          String plaintext = plaintextController.text;
+                          String jsonAsymmetricEncryption = ciphertextController.text;
                           String privateKeyPem = privateKeyController.text;
 
-                          String signatureBase64 = '';
+                          String algorithm = '';
+                          String ciphertextBase64 = '';
                           try {
-
-                            final privateKey = RSAPrivateKey.fromPEM(privateKeyPem);
-                            final signature = privateKey.signPssToBase64(plaintext);
-                            signatureBase64 = signature;
-                          } catch (error) {
-                            outputController.text = 'Fehler beim Signieren';
+                            final parsedJson = json.decode(jsonAsymmetricEncryption);
+                            algorithm = parsedJson['algorithm'];
+                            ciphertextBase64 = parsedJson['ciphertext'];
+                          } on FormatException catch (e) {
+                            outputController.text =
+                                'Fehler: Die Eingabe sieht nicht nach einem Json-Datensatz aus.';
+                            return;
+                          } on NoSuchMethodError catch (e) {
+                            outputController.text =
+                                'Fehler: Die Eingabe ist ungültig.';
                             return;
                           }
-                          // build output string
-                          String _formdata = 'RSA-2048 PSS' +
-                              ':' +
-                              base64Encoding(createUint8ListFromString(plaintext)) +
-                              ':' +
-                              signatureBase64;
-                          String jsonOutput = _returnJson(_formdata);
-                          outputController.text = jsonOutput;
+                          if (algorithm != 'RSA-2048 OAEP SHA-1') {
+                            outputController.text =
+                                'Fehler: es handelt sich nicht um einen Datensatz, der mit RSA-2048 OAEP SHA-1 verschlüsselt worden ist.';
+                            return;
+                          }
+
+                          String decryptedtext = '';
+                          try {
+                            pc.RSAPrivateKey privateKey =
+                            CryptoUtils.rsaPrivateKeyFromPem(privateKeyPem)
+                            as pc.RSAPrivateKey;
+                            decryptedtext = new String.fromCharCodes(rsaOaepSha1Decrypt(privateKey, base64Decoding(ciphertextBase64)));
+                          } catch (error) {
+                            outputController.text = 'Fehler beim Entschlüsseln';
+                            return;
+                          }
+                          outputController.text = decryptedtext;
                         } else {
                           print("Formular ist nicht gültig");
                         }
                       },
-                      child: Text('signieren'),
+                      child: Text('entschlüsseln'),
                     )
                   ],
                 ),
+
                 SizedBox(height: 20),
                 TextFormField(
                   controller: outputController,
-                  maxLines: 15,
-                  maxLength: 700,
+                  maxLines: 3,
+                  maxLength: 500,
                   decoration: InputDecoration(
-                    labelText: 'Ausgabe',
-                    hintText: 'Ausgabe',
+                    labelText: 'Klartext',
+                    hintText: 'hier steht der entschlüsselte Text',
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -311,8 +295,8 @@ class _MyFormPageState extends State<Rsa2048PssSignatureRoute> {
                         await Clipboard.setData(data);
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: const Text(
-                                'Daten in die Zwischenablage kopiert'),
+                            content:
+                                const Text('in die Zwischenablage kopiert'),
                           ),
                         );
                       },
@@ -326,6 +310,39 @@ class _MyFormPageState extends State<Rsa2048PssSignatureRoute> {
         ),
       ),
     );
+  }
+
+  Uint8List rsaOaepSha1Encrypt(RSAPublicKey myPublic, Uint8List dataToEncrypt) {
+    final encryptor = pc.OAEPEncoding(pc.RSAEngine())
+      ..init(
+          true, pc.PublicKeyParameter<RSAPublicKey>(myPublic)); // true=encrypt
+    return _processInBlocks(encryptor, dataToEncrypt);
+  }
+
+  Uint8List rsaOaepSha1Decrypt(RSAPrivateKey myPrivate, Uint8List cipherText) {
+    final decryptor = pc.OAEPEncoding(pc.RSAEngine())
+      ..init(false,
+          pc.PrivateKeyParameter<RSAPrivateKey>(myPrivate)); // false=decrypt
+    return _processInBlocks(decryptor, cipherText);
+  }
+
+  Uint8List _processInBlocks(pc.AsymmetricBlockCipher engine, Uint8List input) {
+    final numBlocks = input.length ~/ engine.inputBlockSize +
+        ((input.length % engine.inputBlockSize != 0) ? 1 : 0);
+    final output = Uint8List(numBlocks * engine.outputBlockSize);
+    var inputOffset = 0;
+    var outputOffset = 0;
+    while (inputOffset < input.length) {
+      final chunkSize = (inputOffset + engine.inputBlockSize <= input.length)
+          ? engine.inputBlockSize
+          : input.length - inputOffset;
+      outputOffset += engine.processBlock(
+          input, inputOffset, chunkSize, output, outputOffset);
+      inputOffset += chunkSize;
+    }
+    return (output.length == outputOffset)
+        ? output
+        : output.sublist(0, outputOffset);
   }
 
   Uint8List createUint8ListFromString(String s) {
@@ -343,22 +360,4 @@ class _MyFormPageState extends State<Rsa2048PssSignatureRoute> {
   Uint8List base64Decoding(String input) {
     return base64.decode(input);
   }
-}
-
-class JsonAsymmetricSignature {
-  JsonAsymmetricSignature({
-    required this.algorithm,
-    required this.plaintext,
-    required this.signature,
-  });
-
-  final String algorithm;
-  final String plaintext;
-  final String signature;
-
-  Map toJson() => {
-        'algorithm': algorithm,
-        'plaintext': plaintext,
-        'signature': signature,
-      };
 }
