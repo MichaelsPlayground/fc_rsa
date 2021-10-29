@@ -1,10 +1,8 @@
 import 'dart:typed_data';
 import 'dart:convert';
-import 'package:basic_utils/basic_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:pointycastle/export.dart' as pc;
-
+import 'package:ninja/asymmetric/rsa/rsa.dart';
 import 'storage.dart';
 
 class Rsa2048Pkcs15SignatureRoute extends StatefulWidget {
@@ -30,37 +28,39 @@ class _MyFormPageState extends State<Rsa2048Pkcs15SignatureRoute> {
   // the following controller have a default value
   TextEditingController plaintextController = TextEditingController(
       text: 'The quick brown fox jumps over the lazy dog');
-  TextEditingController publicKeyController = TextEditingController();
+  TextEditingController privateKeyController = TextEditingController();
   TextEditingController outputController = TextEditingController();
 
   String txtDescription =
-      'RSA 2048 Signatur mit PKCS 1.5 Padding und SHA-256 Hashing.'
+      'RSA 2048 Signatur mit PKCS 1.5 Padding und SHA-1 Hashing.'
       ' Der öffentliche Schlüssel ist im PEM PKCS#8 Format.';
 
   String _returnJson(String data) {
     var parts = data.split(':');
     var algorithm = parts[0];
-    var ciphertext = parts[1];
+    var plaintext = parts[1];
+    var signature = parts[2];
 
-    JsonAsymmetricEncryption jsonAsymmetricEncryption = JsonAsymmetricEncryption(
+    JsonAsymmetricSignature jsonAsymmetricSignature = JsonAsymmetricSignature(
         algorithm: algorithm,
-        ciphertext: ciphertext);
+        plaintext: plaintext,
+        signature: signature);
 
-    String encryptionResult = jsonEncode(jsonAsymmetricEncryption);
+    String encryptionResult = jsonEncode(jsonAsymmetricSignature);
     // make it pretty
     var object = json.decode(encryptionResult);
     var prettyEncryptionResult2 = JsonEncoder.withIndent('  ').convert(object);
     return prettyEncryptionResult2;
   }
 
-  Future<bool> _fileExistsPublicKey() async {
+  Future<bool> _fileExistsPrivateKey() async {
     bool ergebnis = false;
-    await Storage().filePublicKeyExists().then((bool value) {
+    await Storage().filePrivateKeyExists().then((bool value) {
       setState(() {
         if (value == true) {
-          publicKeyController.text = 'Datei existiert ';
+          privateKeyController.text = 'Datei existiert ';
         } else {
-          publicKeyController.text = 'Datei existiert NICHT';
+          privateKeyController.text = 'Datei existiert NICHT';
         }
         ergebnis = value;
       });
@@ -68,10 +68,10 @@ class _MyFormPageState extends State<Rsa2048Pkcs15SignatureRoute> {
     return ergebnis;
   }
 
-  Future<void> _readDataPublicKey() async {
-    Storage().readDataPublicKey().then((String value) {
+  Future<void> _readDataPrivateKey() async {
+    Storage().readDataPrivateKey().then((String value) {
       setState(() {
-        publicKeyController.text = value;
+        privateKeyController.text = value;
       });
     });
   }
@@ -110,7 +110,7 @@ class _MyFormPageState extends State<Rsa2048Pkcs15SignatureRoute> {
                 TextFormField(
                   controller: plaintextController,
                   maxLines: 3,
-                  maxLength: 500,
+                  maxLength: 100,
                   keyboardType: TextInputType.multiline,
                   autocorrect: false,
                   decoration: InputDecoration(
@@ -153,16 +153,16 @@ class _MyFormPageState extends State<Rsa2048Pkcs15SignatureRoute> {
                 ),
 
                 SizedBox(height: 20),
-                // public key
+                // private key
                 TextFormField(
-                  controller: publicKeyController,
+                  controller: privateKeyController,
                   maxLines: 4,
-                  maxLength: 600,
+                  maxLength: 2000,
                   keyboardType: TextInputType.multiline,
                   autocorrect: false,
                   // enabled: false,
                   decoration: InputDecoration(
-                    labelText: 'Öffentlicher Schlüssel',
+                    labelText: 'Privater Schlüssel',
                     border: OutlineInputBorder(),
                   ),
                   validator: (value) {
@@ -184,7 +184,7 @@ class _MyFormPageState extends State<Rsa2048Pkcs15SignatureRoute> {
                       onPressed: () async {
                         final data =
                             await Clipboard.getData(Clipboard.kTextPlain);
-                        publicKeyController.text = data!.text!;
+                        privateKeyController.text = data!.text!;
                       },
                       child: Text('Schlüssel aus Zwischenablage einfügen'),
                     )
@@ -200,7 +200,7 @@ class _MyFormPageState extends State<Rsa2048Pkcs15SignatureRoute> {
                           primary: Colors.grey,
                           textStyle: TextStyle(color: Colors.white)),
                       onPressed: () {
-                        publicKeyController.text = '';
+                        privateKeyController.text = '';
                       },
                       child: Text('Feld löschen'),
                     ),
@@ -210,10 +210,10 @@ class _MyFormPageState extends State<Rsa2048Pkcs15SignatureRoute> {
                           primary: Colors.blue,
                           textStyle: TextStyle(color: Colors.white)),
                       onPressed: () async {
-                        bool pubKeyFileExists =
-                            await _fileExistsPublicKey() as bool;
-                        if (pubKeyFileExists) {
-                          await _readDataPublicKey();
+                        bool priKeyFileExists =
+                            await _fileExistsPrivateKey() as bool;
+                        if (priKeyFileExists) {
+                          await _readDataPrivateKey();
                         }
                       },
                       child: Text('lokal laden'),
@@ -231,7 +231,10 @@ class _MyFormPageState extends State<Rsa2048Pkcs15SignatureRoute> {
                           textStyle: TextStyle(color: Colors.white)),
                       onPressed: () {
                         // reset() setzt alle Felder wieder auf den Initalwert zurück.
-                        _formKey.currentState!.reset();
+                        //_formKey.currentState!.reset();
+                        plaintextController.text = '';
+                        privateKeyController.text = '';
+                        outputController.text = '';
                       },
                       child: Text('Formulardaten löschen'),
                     ),
@@ -240,29 +243,26 @@ class _MyFormPageState extends State<Rsa2048Pkcs15SignatureRoute> {
                       style: ElevatedButton.styleFrom(
                           primary: Colors.blue,
                           textStyle: TextStyle(color: Colors.white)),
-                      onPressed: () {
+                      onPressed: () async {
                         // Wenn alle Validatoren der Felder des Formulars gültig sind.
                         if (_formKey.currentState!.validate()) {
                           String plaintext = plaintextController.text;
-                          String publicKemPem = publicKeyController.text;
+                          String privateKeyPem = privateKeyController.text;
 
-                          String ciphertextBase64 = '';
+                          String signatureBase64 = '';
                           try {
-                            pc.RSAPublicKey publicKey =
-                                CryptoUtils.rsaPublicKeyFromPem(publicKemPem)
-                                    as RSAPublicKey;
-                            final plaintextUint8List =
-                                createUint8ListFromString(plaintext);
-                            ciphertextBase64 = base64Encoding(
-                                rsaPkcs15Encrypt(publicKey, plaintextUint8List));
+                            final privateKey = RSAPrivateKey.fromPEM(privateKeyPem);
+                            signatureBase64 = privateKey.signSsaPkcs1v15ToBase64(plaintext);
                           } catch (error) {
-                            outputController.text = 'Fehler beim Verschlüsseln';
+                            outputController.text = 'Fehler beim Signieren';
                             return;
                           }
                           // build output string
                           String _formdata = 'RSA-2048 PKCS 1.5' +
                               ':' +
-                              ciphertextBase64;
+                              base64Encoding(createUint8ListFromString(plaintext)) +
+                              ':' +
+                              signatureBase64;
                           String jsonOutput = _returnJson(_formdata);
                           outputController.text = jsonOutput;
                         } else {
@@ -273,11 +273,12 @@ class _MyFormPageState extends State<Rsa2048Pkcs15SignatureRoute> {
                     )
                   ],
                 ),
+
                 SizedBox(height: 20),
                 TextFormField(
                   controller: outputController,
                   maxLines: 15,
-                  maxLength: 500,
+                  maxLength: 700,
                   decoration: InputDecoration(
                     labelText: 'Ausgabe',
                     hintText: 'Ausgabe',
@@ -324,39 +325,6 @@ class _MyFormPageState extends State<Rsa2048Pkcs15SignatureRoute> {
     );
   }
 
-  Uint8List rsaPkcs15Encrypt(RSAPublicKey myPublic, Uint8List dataToEncrypt) {
-    final encryptor = pc.PKCS1Encoding(pc.RSAEngine())
-      ..init(
-          true, pc.PublicKeyParameter<RSAPublicKey>(myPublic)); // true=encrypt
-    return _processInBlocks(encryptor, dataToEncrypt);
-  }
-
-  Uint8List rsaPkcs151Decrypt(RSAPrivateKey myPrivate, Uint8List cipherText) {
-    final decryptor = pc.PKCS1Encoding(pc.RSAEngine())
-      ..init(false,
-          pc.PrivateKeyParameter<RSAPrivateKey>(myPrivate)); // false=decrypt
-    return _processInBlocks(decryptor, cipherText);
-  }
-
-  Uint8List _processInBlocks(pc.AsymmetricBlockCipher engine, Uint8List input) {
-    final numBlocks = input.length ~/ engine.inputBlockSize +
-        ((input.length % engine.inputBlockSize != 0) ? 1 : 0);
-    final output = Uint8List(numBlocks * engine.outputBlockSize);
-    var inputOffset = 0;
-    var outputOffset = 0;
-    while (inputOffset < input.length) {
-      final chunkSize = (inputOffset + engine.inputBlockSize <= input.length)
-          ? engine.inputBlockSize
-          : input.length - inputOffset;
-      outputOffset += engine.processBlock(
-          input, inputOffset, chunkSize, output, outputOffset);
-      inputOffset += chunkSize;
-    }
-    return (output.length == outputOffset)
-        ? output
-        : output.sublist(0, outputOffset);
-  }
-
   Uint8List createUint8ListFromString(String s) {
     var ret = new Uint8List(s.length);
     for (var i = 0; i < s.length; i++) {
@@ -374,17 +342,20 @@ class _MyFormPageState extends State<Rsa2048Pkcs15SignatureRoute> {
   }
 }
 
-class JsonAsymmetricEncryption {
-  JsonAsymmetricEncryption({
+class JsonAsymmetricSignature {
+  JsonAsymmetricSignature({
     required this.algorithm,
-    required this.ciphertext,
+    required this.plaintext,
+    required this.signature,
   });
 
   final String algorithm;
-  final String ciphertext;
+  final String plaintext;
+  final String signature;
 
   Map toJson() => {
         'algorithm': algorithm,
-        'ciphertext': ciphertext,
+        'plaintext': plaintext,
+        'signature': signature,
       };
 }

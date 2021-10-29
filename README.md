@@ -1,5 +1,9 @@
 # fc_rsa
 
+Hinweis: Das Archiv enthält auch die Source Dateien für pointycastle rsa crypto
+
+umgestellt auf ninja-dart
+
 ninja dart für signature + encryption 
 
 https://pub.dev/packages/ninja

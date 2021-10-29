@@ -3,9 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:ninja/asymmetric/rsa/rsa.dart';
-import 'package:ninja/asymmetric/rsa/signer/emsa_pss.dart';
-
-
 import 'storage.dart';
 
 class Rsa2048PssSignatureVerificationRoute extends StatefulWidget {
@@ -30,6 +27,7 @@ class _MyFormPageState extends State<Rsa2048PssSignatureVerificationRoute> {
   TextEditingController ciphertextController = TextEditingController();
   TextEditingController publicKeyController = TextEditingController();
   TextEditingController outputController = TextEditingController();
+  TextEditingController signatureVerificationController = TextEditingController();
 
   String txtDescription = 'RSA 2048 Verifikation einer Unterschrift mit RSA PSS Padding.'
       ' Der öffentliche Schlüssel ist im PEM PKCS#8 Format.';
@@ -239,29 +237,28 @@ class _MyFormPageState extends State<Rsa2048PssSignatureVerificationRoute> {
                           }
                           if (algorithm != 'RSA-2048 PSS') {
                             outputController.text =
-                                'Fehler: es handelt sich nicht um einen Datensatz, der mit RSA-2048 OAEP SHA-1 verschlüsselt worden ist.';
+                                'Fehler: es handelt sich nicht um einen Datensatz, der mit RSA-2048 PSS signiert worden ist.';
                             return;
                           }
 
-                          String decryptedtext = '';
+                          String verificationtext = '';
                           try {
                             final publicKey = RSAPublicKey.fromPEM(publicKeyPem);
                             final signature = base64Decoding(signatureBase64);
                             final plaintext = base64Decoding(plaintextBase64);
                             final verified = publicKey.verifySsaPss(signature, plaintext);
                             if (verified == true) {
-                              decryptedtext = 'Die Signatur ist RICHTIG';
+                              verificationtext = 'Die Signatur ist RICHTIG';
                             } else {
-                              decryptedtext = 'Die Signatur ist FALSCH';
+                              verificationtext = 'Die Signatur ist FALSCH';
                             }
                           } catch (error) {
-                            outputController.text = 'Die Signatur ist FALSCH';
+                            signatureVerificationController.text = 'Die Signatur ist FALSCH';
                             return;
                           }
-
-                          // todo Ausgabe des Plaintextes in ein Feld und Ausgabe der Signaturprüfung in ein anderes Feld (farblich rot/grün?)
-
-                          outputController.text = decryptedtext;
+                          signatureVerificationController.text = verificationtext;
+                          // cleartext output
+                          outputController.text = new String.fromCharCodes(base64Decoding(plaintextBase64));
                         } else {
                           print("Formular ist nicht gültig");
                         }
@@ -269,6 +266,18 @@ class _MyFormPageState extends State<Rsa2048PssSignatureVerificationRoute> {
                       child: Text('Signatur prüfen'),
                     )
                   ],
+                ),
+
+                SizedBox(height: 20),
+                TextFormField(
+                  controller: signatureVerificationController,
+                  maxLines: 1,
+                  enabled: false,
+                  decoration: InputDecoration(
+                    labelText: 'Gültigkeit der Signatur',
+                    hintText: 'Gültigkeit der Signatur',
+                    border: OutlineInputBorder(),
+                  ),
                 ),
 
                 SizedBox(height: 20),
@@ -320,19 +329,6 @@ class _MyFormPageState extends State<Rsa2048PssSignatureVerificationRoute> {
         ),
       ),
     );
-  }
-
-
-  Uint8List createUint8ListFromString(String s) {
-    var ret = new Uint8List(s.length);
-    for (var i = 0; i < s.length; i++) {
-      ret[i] = s.codeUnitAt(i);
-    }
-    return ret;
-  }
-
-  String base64Encoding(Uint8List input) {
-    return base64.encode(input);
   }
 
   Uint8List base64Decoding(String input) {

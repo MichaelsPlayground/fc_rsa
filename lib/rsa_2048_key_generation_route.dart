@@ -1,14 +1,9 @@
 import 'dart:io';
-import 'dart:math';
-import 'dart:typed_data';
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:ninja/asymmetric/rsa/rsa.dart';
+import 'storage.dart';
 
-import 'package:fc_rsa/storage.dart';
-
-import 'package:pointycastle/export.dart' as pc;
-import 'package:basic_utils/basic_utils.dart';
 
 class Rsa2048KeyGenerationRoute extends StatefulWidget {
   const Rsa2048KeyGenerationRoute({Key? key}) : super(key: key);
@@ -236,11 +231,9 @@ class _MyFormPageState extends State<Rsa2048KeyGenerationRoute> {
                           textStyle: TextStyle(color: Colors.white)),
                       onPressed: () {
                         // generate a RSA key pair with 2048 bit strength
-                        pc.AsymmetricKeyPair akp = CryptoUtils.generateRSAKeyPair(keySize: 2048);
-                        pc.RSAPrivateKey privateKey = akp.privateKey as RSAPrivateKey;
-                        pc.RSAPublicKey publicKey = akp.publicKey as RSAPublicKey;
-                        String privateKeyPem = CryptoUtils.encodeRSAPrivateKeyToPem(privateKey);
-                        String publicKeyPem = CryptoUtils.encodeRSAPublicKeyToPem(publicKey);
+                        final privateKey = RSAPrivateKey.generate(2048);
+                        String privateKeyPem = privateKey.toPem(toPkcs1: false);
+                        String publicKeyPem = privateKey.toPublicKey.toPem(toPkcs1: false);
                         privateKeyAfterGeneration = privateKeyPem;
                         publicKeyAfterGeneration = publicKeyPem;
                         privateKeyController.text = privateKeyPem;

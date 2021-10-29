@@ -49,36 +49,7 @@ class Storage {
     final file = await localPublicKeyFile;
     return file.writeAsString("$data");
   }
-/*
-  Future<int> deleteFile() async {
-    try {
-      final file = await localFile;
-      await file.delete();
-      return 1;
-    } catch (e) {
-      return 0;
-    }
-  }
 
-  Future<void> deleteFile2() async {
-    try {
-      final file = await localFile;
-      await file.delete();
-    } catch (e) {
-      //return 0;
-    }
-  }
-
-  Future<String> deleteFile3() async {
-    try {
-      final file = await localFile;
-      await file.delete();
-      return '1';
-    } catch (e) {
-      return '0';
-    }
-  }
-*/
   Future<bool> filePrivateKeyExists() async {
     try {
       final file = await localPrivateKeyFile;

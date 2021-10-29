@@ -1,10 +1,7 @@
-import 'dart:typed_data';
 import 'dart:convert';
-import 'package:basic_utils/basic_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:pointycastle/export.dart' as pc;
-
+import 'package:ninja/asymmetric/rsa/rsa.dart';
 import 'storage.dart';
 
 class Rsa2048OaepSha1DecryptionRoute extends StatefulWidget {
@@ -243,10 +240,14 @@ class _MyFormPageState extends State<Rsa2048OaepSha1DecryptionRoute> {
 
                           String decryptedtext = '';
                           try {
+                            final privateKey = RSAPrivateKey.fromPEM(privateKeyPem);
+                            decryptedtext = privateKey.decryptOaepToUtf8(ciphertextBase64);
+                            /*
                             pc.RSAPrivateKey privateKey =
                             CryptoUtils.rsaPrivateKeyFromPem(privateKeyPem)
                             as pc.RSAPrivateKey;
                             decryptedtext = new String.fromCharCodes(rsaOaepSha1Decrypt(privateKey, base64Decoding(ciphertextBase64)));
+                            */
                           } catch (error) {
                             outputController.text = 'Fehler beim Entschlüsseln';
                             return;
@@ -310,54 +311,5 @@ class _MyFormPageState extends State<Rsa2048OaepSha1DecryptionRoute> {
         ),
       ),
     );
-  }
-
-  Uint8List rsaOaepSha1Encrypt(RSAPublicKey myPublic, Uint8List dataToEncrypt) {
-    final encryptor = pc.OAEPEncoding(pc.RSAEngine())
-      ..init(
-          true, pc.PublicKeyParameter<RSAPublicKey>(myPublic)); // true=encrypt
-    return _processInBlocks(encryptor, dataToEncrypt);
-  }
-
-  Uint8List rsaOaepSha1Decrypt(RSAPrivateKey myPrivate, Uint8List cipherText) {
-    final decryptor = pc.OAEPEncoding(pc.RSAEngine())
-      ..init(false,
-          pc.PrivateKeyParameter<RSAPrivateKey>(myPrivate)); // false=decrypt
-    return _processInBlocks(decryptor, cipherText);
-  }
-
-  Uint8List _processInBlocks(pc.AsymmetricBlockCipher engine, Uint8List input) {
-    final numBlocks = input.length ~/ engine.inputBlockSize +
-        ((input.length % engine.inputBlockSize != 0) ? 1 : 0);
-    final output = Uint8List(numBlocks * engine.outputBlockSize);
-    var inputOffset = 0;
-    var outputOffset = 0;
-    while (inputOffset < input.length) {
-      final chunkSize = (inputOffset + engine.inputBlockSize <= input.length)
-          ? engine.inputBlockSize
-          : input.length - inputOffset;
-      outputOffset += engine.processBlock(
-          input, inputOffset, chunkSize, output, outputOffset);
-      inputOffset += chunkSize;
-    }
-    return (output.length == outputOffset)
-        ? output
-        : output.sublist(0, outputOffset);
-  }
-
-  Uint8List createUint8ListFromString(String s) {
-    var ret = new Uint8List(s.length);
-    for (var i = 0; i < s.length; i++) {
-      ret[i] = s.codeUnitAt(i);
-    }
-    return ret;
-  }
-
-  String base64Encoding(Uint8List input) {
-    return base64.encode(input);
-  }
-
-  Uint8List base64Decoding(String input) {
-    return base64.decode(input);
   }
 }

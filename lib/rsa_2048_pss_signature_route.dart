@@ -3,8 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:ninja/asymmetric/rsa/rsa.dart';
-
-
 import 'storage.dart';
 
 class Rsa2048PssSignatureRoute extends StatefulWidget {
@@ -34,7 +32,7 @@ class _MyFormPageState extends State<Rsa2048PssSignatureRoute> {
   TextEditingController outputController = TextEditingController();
 
   String txtDescription =
-      'RSA 2048 Signatur mit PSS Padding und SHA-256 Hashing.'
+      'RSA 2048 Signatur mit PSS Padding und SHA-1 Hashing.'
       ' Der öffentliche Schlüssel ist im PEM PKCS#8 Format.';
 
   String _returnJson(String data) {
@@ -253,10 +251,8 @@ class _MyFormPageState extends State<Rsa2048PssSignatureRoute> {
 
                           String signatureBase64 = '';
                           try {
-
                             final privateKey = RSAPrivateKey.fromPEM(privateKeyPem);
-                            final signature = privateKey.signPssToBase64(plaintext);
-                            signatureBase64 = signature;
+                            signatureBase64 = privateKey.signPssToBase64(plaintext);
                           } catch (error) {
                             outputController.text = 'Fehler beim Signieren';
                             return;
@@ -277,6 +273,7 @@ class _MyFormPageState extends State<Rsa2048PssSignatureRoute> {
                     )
                   ],
                 ),
+
                 SizedBox(height: 20),
                 TextFormField(
                   controller: outputController,
