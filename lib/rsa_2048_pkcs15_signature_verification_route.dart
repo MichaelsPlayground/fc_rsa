@@ -27,9 +27,11 @@ class _MyFormPageState extends State<Rsa2048Pkcs15SignatureVerificationRoute> {
   TextEditingController ciphertextController = TextEditingController();
   TextEditingController publicKeyController = TextEditingController();
   TextEditingController outputController = TextEditingController();
-  TextEditingController signatureVerificationController = TextEditingController();
+  TextEditingController signatureVerificationController =
+      TextEditingController();
 
-  String txtDescription = 'RSA 2048 Verifikation einer Unterschrift mit RSA PKCS 1.5 Padding.'
+  String txtDescription =
+      'RSA 2048 Verifikation einer Unterschrift mit RSA PKCS 1.5 Padding.'
       ' Der öffentliche Schlüssel ist im PEM PKCS#8 Format.';
 
   Future<bool> _fileExistsPublicKey() async {
@@ -90,8 +92,7 @@ class _MyFormPageState extends State<Rsa2048Pkcs15SignatureVerificationRoute> {
                   maxLength: 700,
                   decoration: InputDecoration(
                     labelText: 'Signatur',
-                    hintText:
-                        'kopieren Sie den signierten Text in dieses Feld',
+                    hintText: 'kopieren Sie den signierten Text in dieses Feld',
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -99,26 +100,30 @@ class _MyFormPageState extends State<Rsa2048Pkcs15SignatureVerificationRoute> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          primary: Colors.grey,
-                          textStyle: TextStyle(color: Colors.white)),
-                      onPressed: () {
-                        ciphertextController.text = '';
-                      },
-                      child: Text('Feld löschen'),
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            primary: Colors.grey,
+                            textStyle: TextStyle(color: Colors.white)),
+                        onPressed: () {
+                          ciphertextController.text = '';
+                        },
+                        child: Text('Feld löschen'),
+                      ),
                     ),
                     SizedBox(width: 15),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          primary: Colors.blue,
-                          textStyle: TextStyle(color: Colors.white)),
-                      onPressed: () async {
-                        final data =
-                            await Clipboard.getData(Clipboard.kTextPlain);
-                        ciphertextController.text = data!.text!;
-                      },
-                      child: Text('aus Zwischenablage einfügen'),
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            primary: Colors.blue,
+                            textStyle: TextStyle(color: Colors.white)),
+                        onPressed: () async {
+                          final data =
+                              await Clipboard.getData(Clipboard.kTextPlain);
+                          ciphertextController.text = data!.text!;
+                        },
+                        child: Text('aus Zwischenablage einfügen'),
+                      ),
                     ),
                   ],
                 ),
@@ -148,17 +153,19 @@ class _MyFormPageState extends State<Rsa2048Pkcs15SignatureVerificationRoute> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          primary: Colors.blue,
-                          textStyle: TextStyle(color: Colors.white)),
-                      onPressed: () async {
-                        final data =
-                        await Clipboard.getData(Clipboard.kTextPlain);
-                        publicKeyController.text = data!.text!;
-                      },
-                      child: Text('Schlüssel aus Zwischenablage einfügen'),
-                    )
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            primary: Colors.blue,
+                            textStyle: TextStyle(color: Colors.white)),
+                        onPressed: () async {
+                          final data =
+                              await Clipboard.getData(Clipboard.kTextPlain);
+                          publicKeyController.text = data!.text!;
+                        },
+                        child: Text('Schlüssel aus Zwischenablage einfügen'),
+                      ),
+                    ),
                   ],
                 ),
 
@@ -166,28 +173,32 @@ class _MyFormPageState extends State<Rsa2048Pkcs15SignatureVerificationRoute> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          primary: Colors.grey,
-                          textStyle: TextStyle(color: Colors.white)),
-                      onPressed: () {
-                        publicKeyController.text = '';
-                      },
-                      child: Text('Feld löschen'),
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            primary: Colors.grey,
+                            textStyle: TextStyle(color: Colors.white)),
+                        onPressed: () {
+                          publicKeyController.text = '';
+                        },
+                        child: Text('Feld löschen'),
+                      ),
                     ),
                     SizedBox(width: 15),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          primary: Colors.blue,
-                          textStyle: TextStyle(color: Colors.white)),
-                      onPressed: () async {
-                        bool pubKeyFileExists =
-                        await _fileExistsPublicKey() as bool;
-                        if (pubKeyFileExists) {
-                          await _readDataPublicKey();
-                        }
-                      },
-                      child: Text('lokal laden'),
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            primary: Colors.blue,
+                            textStyle: TextStyle(color: Colors.white)),
+                        onPressed: () async {
+                          bool pubKeyFileExists =
+                              await _fileExistsPublicKey() as bool;
+                          if (pubKeyFileExists) {
+                            await _readDataPublicKey();
+                          }
+                        },
+                        child: Text('lokal laden'),
+                      ),
                     ),
                   ],
                 ),
@@ -196,75 +207,86 @@ class _MyFormPageState extends State<Rsa2048Pkcs15SignatureVerificationRoute> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          primary: Colors.grey,
-                          textStyle: TextStyle(color: Colors.white)),
-                      onPressed: () {
-                        //_formKey.currentState!.reset();
-                        ciphertextController.text = '';
-                        publicKeyController.text = '';
-                      },
-                      child: Text('Formulardaten löschen'),
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            primary: Colors.grey,
+                            textStyle: TextStyle(color: Colors.white)),
+                        onPressed: () {
+                          //_formKey.currentState!.reset();
+                          ciphertextController.text = '';
+                          publicKeyController.text = '';
+                        },
+                        child: Text('Formulardaten löschen'),
+                      ),
                     ),
                     SizedBox(width: 25),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          primary: Colors.blue,
-                          textStyle: TextStyle(color: Colors.white)),
-                      onPressed: () async {
-                        // Wenn alle Validatoren der Felder des Formulars gültig sind.
-                        if (_formKey.currentState!.validate()) {
-                          String jsonAsymmetricEncryption = ciphertextController.text;
-                          String publicKeyPem = publicKeyController.text;
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            primary: Colors.blue,
+                            textStyle: TextStyle(color: Colors.white)),
+                        onPressed: () async {
+                          // Wenn alle Validatoren der Felder des Formulars gültig sind.
+                          if (_formKey.currentState!.validate()) {
+                            String jsonAsymmetricEncryption =
+                                ciphertextController.text;
+                            String publicKeyPem = publicKeyController.text;
 
-                          String algorithm = '';
-                          String plaintextBase64 = '';
-                          String signatureBase64 = '';
-                          try {
-                            final parsedJson = json.decode(jsonAsymmetricEncryption);
-                            algorithm = parsedJson['algorithm'];
-                            plaintextBase64 = parsedJson['plaintext'];
-                            signatureBase64 = parsedJson['signature'];
-                          } on FormatException catch (e) {
-                            outputController.text =
-                                'Fehler: Die Eingabe sieht nicht nach einem Json-Datensatz aus.';
-                            return;
-                          } on NoSuchMethodError catch (e) {
-                            outputController.text =
-                                'Fehler: Die Eingabe ist ungültig.';
-                            return;
-                          }
-                          if (algorithm != 'RSA-2048 PKCS 1.5') {
-                            outputController.text =
-                                'Fehler: es handelt sich nicht um einen Datensatz, der mit RSA-2048 PKCS 1.5 signiert worden ist.';
-                            return;
-                          }
-
-                          String verificationtext = '';
-                          try {
-                            final publicKey = RSAPublicKey.fromPEM(publicKeyPem);
-                            final signature = base64Decoding(signatureBase64);
-                            final plaintext = base64Decoding(plaintextBase64);
-                            final verified = publicKey.verifySsaPkcs1v15(signature, plaintext);
-                            if (verified == true) {
-                              verificationtext = 'Die Signatur ist RICHTIG';
-                            } else {
-                              verificationtext = 'Die Signatur ist FALSCH';
+                            String algorithm = '';
+                            String plaintextBase64 = '';
+                            String signatureBase64 = '';
+                            try {
+                              final parsedJson =
+                                  json.decode(jsonAsymmetricEncryption);
+                              algorithm = parsedJson['algorithm'];
+                              plaintextBase64 = parsedJson['plaintext'];
+                              signatureBase64 = parsedJson['signature'];
+                            } on FormatException catch (e) {
+                              outputController.text =
+                                  'Fehler: Die Eingabe sieht nicht nach einem Json-Datensatz aus.';
+                              return;
+                            } on NoSuchMethodError catch (e) {
+                              outputController.text =
+                                  'Fehler: Die Eingabe ist ungültig.';
+                              return;
                             }
-                          } catch (error) {
-                            signatureVerificationController.text = 'Die Signatur ist FALSCH';
-                            return;
+                            if (algorithm != 'RSA-2048 PKCS 1.5') {
+                              outputController.text =
+                                  'Fehler: es handelt sich nicht um einen Datensatz, der mit RSA-2048 PKCS 1.5 signiert worden ist.';
+                              return;
+                            }
+
+                            String verificationtext = '';
+                            try {
+                              final publicKey =
+                                  RSAPublicKey.fromPEM(publicKeyPem);
+                              final signature = base64Decoding(signatureBase64);
+                              final plaintext = base64Decoding(plaintextBase64);
+                              final verified = publicKey.verifySsaPkcs1v15(
+                                  signature, plaintext);
+                              if (verified == true) {
+                                verificationtext = 'Die Signatur ist RICHTIG';
+                              } else {
+                                verificationtext = 'Die Signatur ist FALSCH';
+                              }
+                            } catch (error) {
+                              signatureVerificationController.text =
+                                  'Die Signatur ist FALSCH';
+                              return;
+                            }
+                            signatureVerificationController.text =
+                                verificationtext;
+                            // cleartext output
+                            outputController.text = new String.fromCharCodes(
+                                base64Decoding(plaintextBase64));
+                          } else {
+                            print("Formular ist nicht gültig");
                           }
-                          signatureVerificationController.text = verificationtext;
-                          // cleartext output
-                          outputController.text = new String.fromCharCodes(base64Decoding(plaintextBase64));
-                        } else {
-                          print("Formular ist nicht gültig");
-                        }
-                      },
-                      child: Text('Signatur prüfen'),
-                    )
+                        },
+                        child: Text('Signatur prüfen'),
+                      ),
+                    ),
                   ],
                 ),
 
@@ -295,31 +317,36 @@ class _MyFormPageState extends State<Rsa2048Pkcs15SignatureVerificationRoute> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          primary: Colors.grey,
-                          textStyle: TextStyle(color: Colors.white)),
-                      onPressed: () {
-                        outputController.text = '';
-                      },
-                      child: Text('Feld löschen'),
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            primary: Colors.grey,
+                            textStyle: TextStyle(color: Colors.white)),
+                        onPressed: () {
+                          outputController.text = '';
+                        },
+                        child: Text('Feld löschen'),
+                      ),
                     ),
                     SizedBox(width: 15),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          primary: Colors.blue,
-                          textStyle: TextStyle(color: Colors.white)),
-                      onPressed: () async {
-                        final data = ClipboardData(text: outputController.text);
-                        await Clipboard.setData(data);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content:
-                                const Text('in die Zwischenablage kopiert'),
-                          ),
-                        );
-                      },
-                      child: Text('in Zwischenablage kopieren'),
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            primary: Colors.blue,
+                            textStyle: TextStyle(color: Colors.white)),
+                        onPressed: () async {
+                          final data =
+                              ClipboardData(text: outputController.text);
+                          await Clipboard.setData(data);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content:
+                                  const Text('in die Zwischenablage kopiert'),
+                            ),
+                          );
+                        },
+                        child: Text('in Zwischenablage kopieren'),
+                      ),
                     ),
                   ],
                 ),

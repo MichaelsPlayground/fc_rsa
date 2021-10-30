@@ -31,6 +31,26 @@ in AndroidManifest.xml ergänzen:
     </queries>
 
 
+// erledigt in alle Formulare einfügen (sonst klappt IOS 11 nicht):
+
+Expanded(
+child:
+
+vor: ElevatedButton(
+
+und nach ), // Elevated Button noch
+), einfügen
+
+nicht eintragen:
+overflow: TextOverflow.ellipsis,
+ergibt: aus ...
+
+suchen/ersetzen:
+
+ElevatedButton(
+
+Expanded(
+child:ElevatedButton(
 
 nicht benutzt:
 

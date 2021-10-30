@@ -28,7 +28,8 @@ class _MyFormPageState extends State<Rsa2048Pkcs15DecryptionRoute> {
   TextEditingController passwordController = TextEditingController();
   TextEditingController outputController = TextEditingController();
 
-  String txtDescription = 'RSA 2048 Entschlüsselung mit PKCS 1.5 Padding (maximal 245 Zeichen).'
+  String txtDescription =
+      'RSA 2048 Entschlüsselung mit PKCS 1.5 Padding (maximal 245 Zeichen).'
       ' Der private Schlüssel ist im PEM PKCS#8 Format.';
 
   Future<bool> _fileExistsPrivateKey() async {
@@ -98,26 +99,30 @@ class _MyFormPageState extends State<Rsa2048Pkcs15DecryptionRoute> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          primary: Colors.grey,
-                          textStyle: TextStyle(color: Colors.white)),
-                      onPressed: () {
-                        ciphertextController.text = '';
-                      },
-                      child: Text('Feld löschen'),
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            primary: Colors.grey,
+                            textStyle: TextStyle(color: Colors.white)),
+                        onPressed: () {
+                          ciphertextController.text = '';
+                        },
+                        child: Text('Feld löschen'),
+                      ),
                     ),
                     SizedBox(width: 15),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          primary: Colors.blue,
-                          textStyle: TextStyle(color: Colors.white)),
-                      onPressed: () async {
-                        final data =
-                            await Clipboard.getData(Clipboard.kTextPlain);
-                        ciphertextController.text = data!.text!;
-                      },
-                      child: Text('aus Zwischenablage einfügen'),
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            primary: Colors.blue,
+                            textStyle: TextStyle(color: Colors.white)),
+                        onPressed: () async {
+                          final data =
+                              await Clipboard.getData(Clipboard.kTextPlain);
+                          ciphertextController.text = data!.text!;
+                        },
+                        child: Text('aus Zwischenablage einfügen'),
+                      ),
                     ),
                   ],
                 ),
@@ -147,17 +152,19 @@ class _MyFormPageState extends State<Rsa2048Pkcs15DecryptionRoute> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          primary: Colors.blue,
-                          textStyle: TextStyle(color: Colors.white)),
-                      onPressed: () async {
-                        final data =
-                        await Clipboard.getData(Clipboard.kTextPlain);
-                        privateKeyController.text = data!.text!;
-                      },
-                      child: Text('Schlüssel aus Zwischenablage einfügen'),
-                    )
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            primary: Colors.blue,
+                            textStyle: TextStyle(color: Colors.white)),
+                        onPressed: () async {
+                          final data =
+                              await Clipboard.getData(Clipboard.kTextPlain);
+                          privateKeyController.text = data!.text!;
+                        },
+                        child: Text('Schlüssel aus Zwischenablage einfügen'),
+                      ),
+                    ),
                   ],
                 ),
 
@@ -165,28 +172,32 @@ class _MyFormPageState extends State<Rsa2048Pkcs15DecryptionRoute> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          primary: Colors.grey,
-                          textStyle: TextStyle(color: Colors.white)),
-                      onPressed: () {
-                        privateKeyController.text = '';
-                      },
-                      child: Text('Feld löschen'),
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            primary: Colors.grey,
+                            textStyle: TextStyle(color: Colors.white)),
+                        onPressed: () {
+                          privateKeyController.text = '';
+                        },
+                        child: Text('Feld löschen'),
+                      ),
                     ),
                     SizedBox(width: 15),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          primary: Colors.blue,
-                          textStyle: TextStyle(color: Colors.white)),
-                      onPressed: () async {
-                        bool priKeyFileExists =
-                        await _fileExistsPrivateKey() as bool;
-                        if (priKeyFileExists) {
-                          await _readDataPrivateKey();
-                        }
-                      },
-                      child: Text('lokal laden'),
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            primary: Colors.blue,
+                            textStyle: TextStyle(color: Colors.white)),
+                        onPressed: () async {
+                          bool priKeyFileExists =
+                              await _fileExistsPrivateKey() as bool;
+                          if (priKeyFileExists) {
+                            await _readDataPrivateKey();
+                          }
+                        },
+                        child: Text('lokal laden'),
+                      ),
                     ),
                   ],
                 ),
@@ -195,64 +206,73 @@ class _MyFormPageState extends State<Rsa2048Pkcs15DecryptionRoute> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          primary: Colors.grey,
-                          textStyle: TextStyle(color: Colors.white)),
-                      onPressed: () {
-                        //_formKey.currentState!.reset();
-                        ciphertextController.text = '';
-                        privateKeyController.text = '';
-                      },
-                      child: Text('Formulardaten löschen'),
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            primary: Colors.grey,
+                            textStyle: TextStyle(color: Colors.white)),
+                        onPressed: () {
+                          //_formKey.currentState!.reset();
+                          ciphertextController.text = '';
+                          privateKeyController.text = '';
+                        },
+                        child: Text('Formulardaten löschen'),
+                      ),
                     ),
                     SizedBox(width: 25),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          primary: Colors.blue,
-                          textStyle: TextStyle(color: Colors.white)),
-                      onPressed: () {
-                        // Wenn alle Validatoren der Felder des Formulars gültig sind.
-                        if (_formKey.currentState!.validate()) {
-                          String jsonAsymmetricEncryption = ciphertextController.text;
-                          String privateKeyPem = privateKeyController.text;
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            primary: Colors.blue,
+                            textStyle: TextStyle(color: Colors.white)),
+                        onPressed: () {
+                          // Wenn alle Validatoren der Felder des Formulars gültig sind.
+                          if (_formKey.currentState!.validate()) {
+                            String jsonAsymmetricEncryption =
+                                ciphertextController.text;
+                            String privateKeyPem = privateKeyController.text;
 
-                          String algorithm = '';
-                          String ciphertextBase64 = '';
-                          try {
-                            final parsedJson = json.decode(jsonAsymmetricEncryption);
-                            algorithm = parsedJson['algorithm'];
-                            ciphertextBase64 = parsedJson['ciphertext'];
-                          } on FormatException catch (e) {
-                            outputController.text =
-                                'Fehler: Die Eingabe sieht nicht nach einem Json-Datensatz aus.';
-                            return;
-                          } on NoSuchMethodError catch (e) {
-                            outputController.text =
-                                'Fehler: Die Eingabe ist ungültig.';
-                            return;
-                          }
-                          if (algorithm != 'RSA-2048 PKCS 1.5') {
-                            outputController.text =
-                                'Fehler: es handelt sich nicht um einen Datensatz, der mit RSA-2048 PKCS 1.5 verschlüsselt worden ist.';
-                            return;
-                          }
+                            String algorithm = '';
+                            String ciphertextBase64 = '';
+                            try {
+                              final parsedJson =
+                                  json.decode(jsonAsymmetricEncryption);
+                              algorithm = parsedJson['algorithm'];
+                              ciphertextBase64 = parsedJson['ciphertext'];
+                            } on FormatException catch (e) {
+                              outputController.text =
+                                  'Fehler: Die Eingabe sieht nicht nach einem Json-Datensatz aus.';
+                              return;
+                            } on NoSuchMethodError catch (e) {
+                              outputController.text =
+                                  'Fehler: Die Eingabe ist ungültig.';
+                              return;
+                            }
+                            if (algorithm != 'RSA-2048 PKCS 1.5') {
+                              outputController.text =
+                                  'Fehler: es handelt sich nicht um einen Datensatz, der mit RSA-2048 PKCS 1.5 verschlüsselt worden ist.';
+                              return;
+                            }
 
-                          String decryptedtext = '';
-                          try {
-                            final privateKey = RSAPrivateKey.fromPEM(privateKeyPem);
-                            decryptedtext = privateKey.decryptPkcs1v15ToUtf8(ciphertextBase64);
-                          } catch (error) {
-                            outputController.text = 'Fehler beim Entschlüsseln';
-                            return;
+                            String decryptedtext = '';
+                            try {
+                              final privateKey =
+                                  RSAPrivateKey.fromPEM(privateKeyPem);
+                              decryptedtext = privateKey
+                                  .decryptPkcs1v15ToUtf8(ciphertextBase64);
+                            } catch (error) {
+                              outputController.text =
+                                  'Fehler beim Entschlüsseln';
+                              return;
+                            }
+                            outputController.text = decryptedtext;
+                          } else {
+                            print("Formular ist nicht gültig");
                           }
-                          outputController.text = decryptedtext;
-                        } else {
-                          print("Formular ist nicht gültig");
-                        }
-                      },
-                      child: Text('entschlüsseln'),
-                    )
+                        },
+                        child: Text('entschlüsseln'),
+                      ),
+                    ),
                   ],
                 ),
 
@@ -271,31 +291,36 @@ class _MyFormPageState extends State<Rsa2048Pkcs15DecryptionRoute> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          primary: Colors.grey,
-                          textStyle: TextStyle(color: Colors.white)),
-                      onPressed: () {
-                        outputController.text = '';
-                      },
-                      child: Text('Feld löschen'),
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            primary: Colors.grey,
+                            textStyle: TextStyle(color: Colors.white)),
+                        onPressed: () {
+                          outputController.text = '';
+                        },
+                        child: Text('Feld löschen'),
+                      ),
                     ),
                     SizedBox(width: 15),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          primary: Colors.blue,
-                          textStyle: TextStyle(color: Colors.white)),
-                      onPressed: () async {
-                        final data = ClipboardData(text: outputController.text);
-                        await Clipboard.setData(data);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content:
-                                const Text('in die Zwischenablage kopiert'),
-                          ),
-                        );
-                      },
-                      child: Text('in Zwischenablage kopieren'),
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            primary: Colors.blue,
+                            textStyle: TextStyle(color: Colors.white)),
+                        onPressed: () async {
+                          final data =
+                              ClipboardData(text: outputController.text);
+                          await Clipboard.setData(data);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content:
+                                  const Text('in die Zwischenablage kopiert'),
+                            ),
+                          );
+                        },
+                        child: Text('in Zwischenablage kopieren'),
+                      ),
                     ),
                   ],
                 ),

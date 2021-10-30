@@ -4,7 +4,6 @@ import 'package:flutter/services.dart';
 import 'package:ninja/asymmetric/rsa/rsa.dart';
 import 'storage.dart';
 
-
 class Rsa2048KeyGenerationRoute extends StatefulWidget {
   const Rsa2048KeyGenerationRoute({Key? key}) : super(key: key);
 
@@ -38,7 +37,8 @@ class _MyFormPageState extends State<Rsa2048KeyGenerationRoute> {
   String privateKeyAfterGeneration = '';
   String publicKeyAfterGeneration = '';
 
-  String txtDescription = 'Erzeugung eines RSA Schlüsselpaares mit 2048 Bit Länge.'
+  String txtDescription =
+      'Erzeugung eines RSA Schlüsselpaares mit 2048 Bit Länge.'
       ' Das Schlüsselpaar kann lokal gespeichert werden.';
 
   Future<bool> _fileExistsPrivateKey() async {
@@ -181,65 +181,75 @@ class _MyFormPageState extends State<Rsa2048KeyGenerationRoute> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          primary: Colors.blue,
-                          textStyle: TextStyle(color: Colors.white)),
-                      onPressed: () async {
-                        if (_formKey.currentState!.validate()) {
-                          final data =
-                          ClipboardData(text: publicKeyController.text);
-                          await Clipboard.setData(data);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              duration: const Duration(seconds: 1),
-                              content: const Text('Öffentlichen Schlüssel in die Zwischenablage kopiert'),
-                            ),
-                          );
-                        } else {
-                          print("Formular ist nicht gültig");
-                        }
-                      },
-                      child: Text('Schlüssel in die Zwischenablage kopieren'),
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            primary: Colors.blue,
+                            textStyle: TextStyle(color: Colors.white)),
+                        onPressed: () async {
+                          if (_formKey.currentState!.validate()) {
+                            final data =
+                                ClipboardData(text: publicKeyController.text);
+                            await Clipboard.setData(data);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                duration: const Duration(seconds: 1),
+                                content: const Text(
+                                    'Öffentlichen Schlüssel in die Zwischenablage kopiert'),
+                              ),
+                            );
+                          } else {
+                            print("Formular ist nicht gültig");
+                          }
+                        },
+                        child: Text('Schlüssel in die Zwischenablage kopieren'),
+                      ),
                     )
                   ],
                 ),
-
 
                 SizedBox(height: 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          primary: Colors.blue,
-                          textStyle: TextStyle(color: Colors.white)),
-                      onPressed: () async {
-                        bool priKeyFileExists = await _fileExistsPrivateKey() as bool;
-                        bool pubKeyFileExists = await _fileExistsPublicKey() as bool;
-                        if (priKeyFileExists && pubKeyFileExists) {
-                          await _readDataPrivateKey();
-                          await _readDataPublicKey();
-                        }
-                      },
-                      child: Text('lokal laden'),
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            primary: Colors.blue,
+                            textStyle: TextStyle(color: Colors.white)),
+                        onPressed: () async {
+                          bool priKeyFileExists =
+                              await _fileExistsPrivateKey() as bool;
+                          bool pubKeyFileExists =
+                              await _fileExistsPublicKey() as bool;
+                          if (priKeyFileExists && pubKeyFileExists) {
+                            await _readDataPrivateKey();
+                            await _readDataPublicKey();
+                          }
+                        },
+                        child: Text('lokal laden'),
+                      ),
                     ),
                     SizedBox(width: 15),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          primary: Colors.blue,
-                          textStyle: TextStyle(color: Colors.white)),
-                      onPressed: () {
-                        // generate a RSA key pair with 2048 bit strength
-                        final privateKey = RSAPrivateKey.generate(2048);
-                        String privateKeyPem = privateKey.toPem(toPkcs1: false);
-                        String publicKeyPem = privateKey.toPublicKey.toPem(toPkcs1: false);
-                        privateKeyAfterGeneration = privateKeyPem;
-                        publicKeyAfterGeneration = publicKeyPem;
-                        privateKeyController.text = privateKeyPem;
-                        publicKeyController.text = publicKeyPem;
-                      },
-                      child: Text('erzeugen'),
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            primary: Colors.blue,
+                            textStyle: TextStyle(color: Colors.white)),
+                        onPressed: () {
+                          // generate a RSA key pair with 2048 bit strength
+                          final privateKey = RSAPrivateKey.generate(2048);
+                          String privateKeyPem =
+                              privateKey.toPem(toPkcs1: false);
+                          String publicKeyPem =
+                              privateKey.toPublicKey.toPem(toPkcs1: false);
+                          privateKeyAfterGeneration = privateKeyPem;
+                          publicKeyAfterGeneration = publicKeyPem;
+                          privateKeyController.text = privateKeyPem;
+                          publicKeyController.text = publicKeyPem;
+                        },
+                        child: Text('erzeugen'),
+                      ),
                     ),
                   ],
                 ),
@@ -248,18 +258,20 @@ class _MyFormPageState extends State<Rsa2048KeyGenerationRoute> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          primary: Colors.grey,
-                          textStyle: TextStyle(color: Colors.white)),
-                      onPressed: () {
-                        privateKeyAfterGeneration = '';
-                        publicKeyAfterGeneration = '';
-                        privateKeyController.text = '';
-                        publicKeyController.text = '';
-                        //_formKey.currentState!.reset();
-                      },
-                      child: Text('Formulardaten löschen'),
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            primary: Colors.grey,
+                            textStyle: TextStyle(color: Colors.white)),
+                        onPressed: () {
+                          privateKeyAfterGeneration = '';
+                          publicKeyAfterGeneration = '';
+                          privateKeyController.text = '';
+                          publicKeyController.text = '';
+                          //_formKey.currentState!.reset();
+                        },
+                        child: Text('Formulardaten löschen'),
+                      ),
                     ),
                   ],
                 ),
@@ -268,33 +280,38 @@ class _MyFormPageState extends State<Rsa2048KeyGenerationRoute> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          primary: Colors.blue,
-                          textStyle: TextStyle(color: Colors.white)),
-                      onPressed: () async {
-                        if (privateKeyAfterGeneration != '' && publicKeyAfterGeneration != '') {
-                          // stores data from privateKeyAfterGeneration and
-                          // publicKeyAfterGeneration
-                          await _writeDataPrivateKey();
-                          await _writeDataPublicKey();
-                          await ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              duration: const Duration(seconds: 1),
-                              content: Text('Privaten und Öffentlichen Schlüssel lokal gespeichert'),
-                            ),
-                          );
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              duration: const Duration(seconds: 2),
-                              content: Text('Keinen Schlüssel lokal gespeichert, bitte erst neu erzeugen.'),
-                            ),
-                          );
-                        }
-                      },
-                      child: Text('Schlüssel lokal speichern'),
-                    )
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            primary: Colors.blue,
+                            textStyle: TextStyle(color: Colors.white)),
+                        onPressed: () async {
+                          if (privateKeyAfterGeneration != '' &&
+                              publicKeyAfterGeneration != '') {
+                            // stores data from privateKeyAfterGeneration and
+                            // publicKeyAfterGeneration
+                            await _writeDataPrivateKey();
+                            await _writeDataPublicKey();
+                            await ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                duration: const Duration(seconds: 1),
+                                content: Text(
+                                    'Privaten und Öffentlichen Schlüssel lokal gespeichert'),
+                              ),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                duration: const Duration(seconds: 2),
+                                content: Text(
+                                    'Keinen Schlüssel lokal gespeichert, bitte erst neu erzeugen.'),
+                              ),
+                            );
+                          }
+                        },
+                        child: Text('Schlüssel lokal speichern'),
+                      ),
+                    ),
                   ],
                 ),
               ],
